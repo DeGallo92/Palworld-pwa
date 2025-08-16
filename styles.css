@@ -15,6 +15,7 @@ h1{font-size:20px;margin:0}
 .import-label{display:inline-flex;gap:8px;align-items:center}
 .import-label input{display:none}
 button.primary{background:linear-gradient(180deg,#465bce,#3a4fb4);border:0}
+button.ghost{background:#242733;border:1px dashed #3a3f52}
 main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px}
 .card{background:var(--card);border:1px solid #232632;border-radius:14px;padding:16px}
 .form-grid{display:grid;grid-template-columns:repeat(2,minmax(200px,1fr));gap:12px}
@@ -48,6 +49,20 @@ dialog::backdrop{background:rgba(0,0,0,0.6)}
 .settings-grid{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 12px}
 .manual{display:flex;gap:8px;margin-top:8px}
 .dlg-actions{display:flex;justify-content:flex-end;margin-top:12px}
+.hidden{display:none !important}
+
+/* Cards view */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.pal-card{background:#121420;border:1px solid #232632;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.pal-card header{display:flex;align-items:center;justify-content:space-between}
+.pal-name{font-weight:600}
+.pal-dex{opacity:.8;font-size:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #30354a;background:#151822}
+.chip.m{background:var(--cell-m)}
+.chip.f{background:var(--cell-f)}
+.chip.mf{background:linear-gradient(90deg,var(--cell-m) 50%,var(--cell-f) 50%)}
+
 @media (max-width:800px){
   .form-grid{grid-template-columns:1fr}
   thead th:nth-child(2), tbody td:nth-child(2){left:100px}

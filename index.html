@@ -58,24 +58,32 @@
 
     <section class="card">
       <div class="toolbar">
-        <div class="search">
+        <div class="left">
+          <button id="toggleViewBtn" class="ghost">📱 Kaarten</button>
+          <select id="comboFilter">
+            <option value="">Alle combinaties</option>
+          </select>
+        </div>
+        <div class="right">
           <input type="text" id="search" placeholder="Zoek Pal...">
-        </div>
-        <div class="toggles">
-          <label class="chk"><input type="checkbox" id="showMissingM"> Toon missende M</label>
-          <label class="chk"><input type="checkbox" id="showMissingF"> Toon missende F</label>
-        </div>
-        <div class="settings">
+          <label class="chk"><input type="checkbox" id="showMissingM"> Enkel missende M</label>
+          <label class="chk"><input type="checkbox" id="showMissingF"> Enkel missende F</label>
           <button id="openSettings">⚙️ Palpedia</button>
         </div>
       </div>
-      <div class="table-wrap">
+
+      <!-- TABEL VIEW -->
+      <div id="tableWrap" class="table-wrap">
         <table id="grid">
           <thead id="thead"></thead>
           <tbody id="tbody"></tbody>
         </table>
       </div>
-      <small>Tip: je kan deze webapp toevoegen aan je iPhone beginscherm of installeren op desktop. Werkt offline.</small>
+
+      <!-- CARDS VIEW -->
+      <div id="cards" class="cards hidden"></div>
+
+      <small>Tip: voeg deze webapp toe aan je iPhone-beginscherm. Werkt offline.</small>
     </section>
 
     <dialog id="settingsDlg">
@@ -105,7 +113,7 @@
         <div class="manual">
           <button id="parsePaldexBtn">Parse & Opslaan</button>
         </div>
-        <small>Tip: kopieer het lijstgedeelte met No. en Pal-namen. De parser herkent vormen als '10 Pengullet', '10B Pengullet Lux', '55 Chillet'.</small>
+        <small>Herkenning: '10 Pengullet', '10B Pengullet Lux', '55 Chillet', …</small>
       </details>
       <div class="dlg-actions">
         <button id="closeSettings">Sluiten</button>
