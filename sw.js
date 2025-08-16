@@ -1,5 +1,5 @@
 
-const CACHE = 'palworld-tracker-cache-v5';
+const CACHE = 'palworld-tracker-cache-v6';
 const ASSETS = ['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./paldex.json'];
 self.addEventListener('install', e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));

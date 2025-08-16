@@ -1,6 +1,6 @@
 
 const SKILLS = ["Legend","DG","V","DB","EF","SV","HIK","EE","KW","RC","Lucky"];
-const storeKey = "palworld-tracker-v3";
+const storeKey = "palworld-tracker-v4";
 const paldexKey = "palworld-paldex-v1"; // { [name]: "10" | "10B" ... }
 let store = loadStore();
 let paldexMap = {};
@@ -48,6 +48,8 @@ const skillsSelect = document.getElementById("skills");
 const hasM = document.getElementById("hasM");
 const hasF = document.getElementById("hasF");
 const addBtn = document.getElementById("addBtn");
+const deleteBtn = document.getElementById("deleteBtn");
+const delComboBtn = document.getElementById("delComboBtn");
 const msg = document.getElementById("msg");
 const search = document.getElementById("search");
 const showMissingM = document.getElementById("showMissingM");
@@ -106,7 +108,6 @@ function refreshComboFilter(){
   });
   comboFilter.value = comboFilterValue;
 }
-
 function cellFor(val){
   const div = document.createElement("div");
   div.className = "cell";
@@ -115,6 +116,10 @@ function cellFor(val){
   else if(val.M) div.classList.add("m");
   else if(val.F) div.classList.add("f");
   return div;
+}
+function canonNameInStore(name){
+  const lower = (name||'').toLowerCase().trim();
+  return Object.keys(store.pals).find(k=> k.toLowerCase()===lower) || null;
 }
 
 // ===== Render: TABLE =====
@@ -135,16 +140,13 @@ function renderTable(){
   filteredPalNames().forEach(name=>{
     const tr = document.createElement("tr");
     const pal = store.pals[name];
-    // Paldex
     const tdDex = document.createElement("td");
     tdDex.textContent = pal.paldex ?? "";
     tr.appendChild(tdDex);
-    // Name
     const tdName = document.createElement("td");
     tdName.textContent = name;
     tdName.style.textAlign = "left";
     tr.appendChild(tdName);
-    // combos
     const combos = comboFilterValue ? [comboFilterValue] : store.allCombos;
     combos.forEach(combo=>{
       const td = document.createElement("td");
@@ -187,11 +189,9 @@ function renderCards(){
     const combos = comboFilterValue ? [comboFilterValue] : store.allCombos;
     combos.forEach(c=>{
       const val = pal.combos[c] || null;
-      // filter by missing M/F if toggled
       const missingM = !val || !val.M;
       const missingF = !val || !val.F;
       if((needM && !missingM) || (needF && !missingF)) return;
-
       chips.appendChild(chipFor(c, val));
     });
 
@@ -259,6 +259,48 @@ function addOrUpdate(){
   toast(message);
   hasM.checked = false; hasF.checked = false;
 }
+
+// ===== Delete handlers =====
+deleteBtn.addEventListener('click', ()=>{
+  let name = (palnameInput.value||'').trim();
+  if(!name){ toast('Geef eerst een Pal naam.'); return; }
+  const fromStore = canonNameInStore(name);
+  if(fromStore) name = fromStore; else {
+    const lower = name.toLowerCase();
+    const canon = Object.keys(paldexMap).find(k=> k.toLowerCase()===lower);
+    if(canon) name = canon;
+  }
+  if(!store.pals[name]){ toast('Niet gevonden: ' + name); return; }
+  if(confirm('Pal \"'+name+'\" volledig verwijderen?')){
+    delete store.pals[name];
+    saveStore(store);
+    (viewMode === "cards" ? renderCards() : renderTable());
+    toast('Pal verwijderd.');
+  }
+});
+delComboBtn.addEventListener('click', ()=>{
+  const selected = Array.from(skillsSelect.selectedOptions).map(o=>o.value);
+  const comboKey = normalizeCombo(selected);
+  let name = (palnameInput.value||'').trim();
+  if(!name){ toast('Geef eerst een Pal naam.'); return; }
+  const fromStore = canonNameInStore(name);
+  if(fromStore) name = fromStore; else {
+    const lower = name.toLowerCase();
+    const canon = Object.keys(paldexMap).find(k=> k.toLowerCase()===lower);
+    if(canon) name = canon;
+  }
+  const pal = store.pals[name];
+  if(!pal){ toast('Niet gevonden: ' + name); return; }
+  if(!comboKey){ toast('Kies de skills van de combo die je wil verwijderen.'); return; }
+  if(!pal.combos[comboKey]){ toast('Deze combo bestaat niet bij '+name+'.'); return; }
+  if(confirm('Combo \"'+comboKey+'\" verwijderen bij '+name+'?')){
+    delete pal.combos[comboKey];
+    if(Object.keys(pal.combos).length===0){ delete store.pals[name]; }
+    saveStore(store);
+    (viewMode === "cards" ? renderCards() : renderTable());
+    toast('Verwijderd.');
+  }
+});
 
 // ===== Events =====
 document.getElementById("palname").addEventListener("change", ()=>{
@@ -367,7 +409,6 @@ if(parseBtn){
       const m = lines[i].match(/^(\d+)([A-Za-z]?)$/);
       if(m){
         const id = m[1] + (m[2]||"");
-        // find next 'name' line
         let j=i+1;
         while(j<lines.length && !/^[A-Za-z][A-Za-z' -]*$/.test(lines[j])) j++;
         if(j<lines.length){
